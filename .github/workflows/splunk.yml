@@ -32,8 +32,7 @@ jobs:
           PASSWORD: ${{ secrets.SPLUNK_PASSWORD }}
           URL: ${{ secrets.URL }}
         run: |
-          "SEARCH=sed 's/\"/\\\"/g' $SEARCH"
-          "curl -k -u $USERNAME:$PASSWORD https://$URL:8089/servicesNS/admin/$APP/saved/searches --data-urlencode search=index=worldoftanks"
+          "curl -k -u $USERNAME:$PASSWORD https://$URL:8089/servicesNS/admin/$APP/saved/searches --data-urlencode 'search=index=worldoftanks | spath output=games path=all.battles'"
         #"curl -k -u $USERNAME:$PASSWORD https://$URL:8089/servicesNS/admin/$APP/saved/searches -d name=$SHORTNAME --data-urlencode 'search=$SEARCH'"
         # CODE="curl -k -u $USERNAME:$PASSWORD https://$URL:8089/servicesNS/admin/$APP/saved/searches -d name=$SHORTNAME -d search=$SEARCH"
         # if [ $CODE!="200" ]
