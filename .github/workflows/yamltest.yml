@@ -1,4 +1,4 @@
-name: splunkcloud
+name: YAML Test
 on:
   push:
     branches:
@@ -22,15 +22,17 @@ jobs:
           search: search
           version: version
           app: app
+      - name: show outputs
+        run: |
+          echo SHORTNAME=${{ steps.parseconfig.outputs.shortname }} >> "$GITHUB_ENV"
+          echo SEARCH=${{ steps.parseconfig.outputs.search }} >> "$GITHUB_ENV"
+          echo VERSION=${{ steps.parseconfig.outputs.version }} >> "$GITHUB_ENV"
+          echo APP=${{ steps.parseconfig.outputs.app }} >> "$GITHUB_ENV"
       - name: Push to Splunk Cloud
         env:
           USERNAME: ${{ secrets.SPLUNK_USERNAME }}
           PASSWORD: ${{ secrets.SPLUNK_PASSWORD }}
           URL: ${{ secrets.URL }}
-          SHORTNAME: ${{ steps.parseconfig.outputs.shortname }}
-          SEARCH: ${{ steps.parseconfig.outputs.search }}
-          VERSION: ${{ steps.parseconfig.outputs.version }}
-          APP: ${{ steps.parseconfig.outputs.app }}
         # Code below tries to add a new saved search called $SHORTNAME. If not successful, try to update instead as it might exist already.
         run: |
           CODE=`curl -s -o /dev/null -w "%{http_code}" -k -X POST -u $USERNAME:$PASSWORD "$URL/servicesNS/admin/$APP/saved/searches" -d "name=$SHORTNAME" -d "search=$SEARCH"`

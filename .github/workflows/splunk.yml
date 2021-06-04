@@ -1,4 +1,4 @@
-name: splunkcloud
+name: Splunk Cloud
 on:
   push:
     branches:
