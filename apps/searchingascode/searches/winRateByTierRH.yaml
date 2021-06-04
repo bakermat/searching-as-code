@@ -1,0 +1,11 @@
+name: find the world of tanks Winrate by Tier
+version: 1
+date: '2021-01-14'
+author: Floris Ladan, Splunk
+type: batch
+cron_schedule: 00,20,40 * * * *
+description: This is running pieters WOT searchs
+search: 'index="worldoftanks" 
+| spath output=games path=all.battles 
+| spath output=wins path=all.wins | eval winrate=(wins/games*100) | stats avg(winrate) AS Winrate by Tier |eval Winrate = round(Winrate,2)'
+
