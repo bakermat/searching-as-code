@@ -24,7 +24,7 @@ jobs:
         run: | 
           echo '${{ steps.parseyaml.outputs.data }}' | jq '"SHORTNAME="+.shortname' >> "$GITHUB_ENV"
           echo '${{ steps.parseyaml.outputs.data }}' | jq '"SEARCH="+.search' >> "$GITHUB_ENV"
-          echo '${{ steps.parseyaml.outputs.data }}' | jq '"VERSION="+.version' >> "$GITHUB_ENV"
+          echo '${{ steps.parseyaml.outputs.data }}' | jq '"VERSION="+(.version|tostring)' >> "$GITHUB_ENV"
           echo '${{ steps.parseyaml.outputs.data }}' | jq '"APP="+.app' >> "$GITHUB_ENV"
       - name: Push to Splunk Cloud
         env:
