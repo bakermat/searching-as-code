@@ -37,7 +37,7 @@ jobs:
           then
             echo "Created saved search $SHORTNAME."
           else
-            curl -k -u $USERNAME:$PASSWORD "$URL:8089/servicesNS/admin/$APP/saved/searches/$SHORTNAME" -d "search=$SEARCH"
+            curl -k -u $USERNAME:$PASSWORD "$URL/servicesNS/admin/$APP/saved/searches/$SHORTNAME" -d "search=$SEARCH"
             echo "Updated saved search $SHORTNAME."
           fi
 
