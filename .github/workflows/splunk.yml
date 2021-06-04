@@ -19,9 +19,11 @@ jobs:
         with:
           path: apps/searchingascode/searches/winRateByTier.yaml
           from: yaml
-          to: yaml
-      - name: Print YAML result
-        run: echo "${{ steps.parseyaml.outputs.data.shortname }}"
+          to: json
+      - name: Get relevant fields from JSON file
+        run: | 
+          SHORTNAME=${{ steps.parseyaml.outputs.data | jq '.shortname' }}
+          echo $SHORTNAME
       - name: Push to Splunk Cloud
         env:
           USERNAME: ${{ secrets.SPLUNK_USERNAME }}
