@@ -21,16 +21,17 @@ jobs:
           INPUT_SEARCH: search
           INPUT_NAME: name
           INPUT_VERSION: version
+          INPUT_APP: app
       - name: Push to Splunk Cloud
         env:
           USERNAME: ${{ secrets.SPLUNK_USERNAME }}
           PASSWORD: ${{ secrets.SPLUNK_PASSWORD }}
           URL: ${{ secrets.URL }}
         run: |
-          CODE="curl -k -u user:passw https://scb-o2-ohgwyyq7dpzxksr.stg.splunkcloud.com:8089/servicesNS/admin/searchingascode/saved/searches -d name=$INPUT_NAME --data-urlencode search=$INPUT_SEARCH"
+          CODE="curl -k -u $USERNAME:$PASSWORD https://$URL:8089/servicesNS/admin/$APP/saved/searches -d name=$INPUT_NAME -d search=$INPUT_SEARCH"
           if [ $CODE!="200"]
           then
-            curl -k -u user:passw https://scb-o2-ohgwyyq7dpzxksr.stg.splunkcloud.com:8089/servicesNS/admin/searchingascode/saved/searches/FlorisSavedSearch  -d search="index=_internal"
+            curl -k -u user:passw https://$URL:8089/servicesNS/admin/$APP/saved/searches/$INPUT_NAME  -d search=$INPUT_SEARCH
             echo "Updated $INPUT_NAME."
           else
             echo "Created $INPUT_NAME."
