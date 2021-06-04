@@ -22,11 +22,10 @@ jobs:
           to: json
       - name: Get relevant fields from JSON file
         run: | 
-          echo '{' | jq '"TEST="+.shortname' > bla.txt
-            echo '${{ steps.parseyaml.outputs.data }}' | jq '"SHORTNAME="+.shortname' >> "$GITHUB_ENV"
-            echo '${{ steps.parseyaml.outputs.data }}' | jq '"SEARCH="+.search' >> "$GITHUB_ENV"
-            echo '${{ steps.parseyaml.outputs.data }}' | jq '"VERSION="+.version' >> "$GITHUB_ENV"
-            echo '${{ steps.parseyaml.outputs.data }}' | jq '"APP="+.app' >> "$GITHUB_ENV"
+          echo '${{ steps.parseyaml.outputs.data }}' | jq '"SHORTNAME="+.shortname' >> "$GITHUB_ENV"
+          echo '${{ steps.parseyaml.outputs.data }}' | jq '"SEARCH="+.search' >> "$GITHUB_ENV"
+          echo '${{ steps.parseyaml.outputs.data }}' | jq '"VERSION="+.version' >> "$GITHUB_ENV"
+          echo '${{ steps.parseyaml.outputs.data }}' | jq '"APP="+.app' >> "$GITHUB_ENV"
       - name: Push to Splunk Cloud
         env:
           USERNAME: ${{ secrets.SPLUNK_USERNAME }}
