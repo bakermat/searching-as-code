@@ -3,9 +3,7 @@ version: 1
 date: '2021-01-14'
 author: Floris Ladan, Splunk
 type: batch
-datamodel:
-- network
-
+cron_schedule: 00,20,40 * * * *
 description: This is running pieters WOT searchs
 search: 'index="worldoftanks" 
 | spath output=games path=all.battles 
