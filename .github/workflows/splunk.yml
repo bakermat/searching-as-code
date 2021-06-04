@@ -6,7 +6,7 @@ on:
       - main
 jobs:
   deploy:
-    name: Deploy to Splunk Cloud
+    name: Parse YAML file & push search to Splunk Cloud
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -24,21 +24,19 @@ jobs:
           from: yaml
           to: yaml
       - name: Print YAML result
-        env:
-          SHORTNAME: "${{ steps.parseyaml.outputs.data.shortname }}"
-          SEARCH: "${{ steps.parseyaml.outputs.data.search }}"
-          VERSION: "${{ steps.parseyaml.outputs.data.version }}"
-          APP: "${{ steps.parseyaml.outputs.data.app }}"
         run: echo "${{ steps.parseyaml.outputs.data }}"
       - name: Push to Splunk Cloud
         env:
           USERNAME: ${{ secrets.SPLUNK_USERNAME }}
           PASSWORD: ${{ secrets.SPLUNK_PASSWORD }}
           URL: ${{ secrets.URL }}
-
+          SHORTNAME: "${{ steps.parseyaml.outputs.data.shortname }}"
+          SEARCH: "${{ steps.parseyaml.outputs.data.search }}"
+          VERSION: "${{ steps.parseyaml.outputs.data.version }}"
+          APP: "${{ steps.parseyaml.outputs.data.app }}"
         run: |
           CODE="curl -k -u $USERNAME:$PASSWORD https://$URL:8089/servicesNS/admin/$APP/saved/searches -d name=$SHORTNAME -d search=$SEARCH"
-          if [ $CODE!="200"]
+          if [ $CODE!="200" ]
           then
             curl -k -u user:passw https://$URL:8089/servicesNS/admin/$APP/saved/searches/$SHORTNAME  -d search=$SEARCH
             echo "Updated $SHORTNAME."
