@@ -6,7 +6,7 @@ on:
       - main
 jobs:
   deploy:
-    name: Deploy to Splunk Cloud
+    name: Parse YAML file & push search to Splunk Cloud
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -14,24 +14,33 @@ jobs:
         with:
           python-version: 3.x
       - name: Parse YAML File
-        uses: CumulusDS/get-yaml-paths-action@v0.1.0
+        uses: fabasoad/yaml-json-xml-converter-action@main
+        id: parseyaml
         with:
-          file: apps/searchAsCode/searches/winRateByTier.yaml
-        env:
-          INPUT_SEARCH: search
-          INPUT_NAME: name
-          INPUT_VERSION: version
+          path: apps/searchingascode/searches/winRateByTier.yaml
+          from: yaml
+          to: json
+      - name: Get relevant fields from JSON file
+        run: | 
+          shortname='${{ steps.parseyaml.outputs.data }}' | jq '.shortname'
+          search='${{ steps.parseyaml.outputs.data }}' | jq '.search'
+          version='${{ steps.parseyaml.outputs.data }}' | jq '.version'
+          app='${{ steps.parseyaml.outputs.data }}' | jq '.app'
+          echo "SHORTNAME=$shortname" >> "$GITHUB_ENV"
+          echo "SEARCH=$search" >> "$GITHUB_ENV"
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+          echo "APP=$app" >> "$GITHUB_ENV"
       - name: Push to Splunk Cloud
         env:
           USERNAME: ${{ secrets.SPLUNK_USERNAME }}
           PASSWORD: ${{ secrets.SPLUNK_PASSWORD }}
           URL: ${{ secrets.URL }}
         run: |
-          CODE="curl -k -u user:passw https://scb-o2-ohgwyyq7dpzxksr.stg.splunkcloud.com:8089/servicesNS/admin/searchingascode/saved/searches -d name=$INPUT_NAME --data-urlencode search=$INPUT_SEARCH"
-          if [ $CODE!="200"]
+          CODE="curl -k -u $USERNAME:$PASSWORD https://$URL:8089/servicesNS/admin/$APP/saved/searches -d name=$SHORTNAME -d search=$SEARCH"
+          if [ $CODE!="200" ]
           then
-            curl -k -u user:passw https://scb-o2-ohgwyyq7dpzxksr.stg.splunkcloud.com:8089/servicesNS/admin/searchingascode/saved/searches/FlorisSavedSearch  -d search="index=_internal"
-            echo "Updated $INPUT_NAME."
+            curl -k -u user:passw https://$URL:8089/servicesNS/admin/$APP/saved/searches/$SHORTNAME  -d search=$SEARCH
+            echo "Updated $SHORTNAME."
           else
-            echo "Created $INPUT_NAME."
+            echo "Created $SHORTNAME."
           fi
