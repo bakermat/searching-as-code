@@ -1,4 +1,6 @@
 name: find the world of tanks Winrate by Tier
+shortname: winrate_by_tier
+app: searchingascode
 version: 1
 date: '2021-01-14'
 author: Floris Ladan, Splunk

@@ -14,25 +14,34 @@ jobs:
         with:
           python-version: 3.x
       - name: Parse YAML File
-        uses: CumulusDS/get-yaml-paths-action@v0.1.0
+      # This action doesn't seem to work anymore
+      # uses: CumulusDS/get-yaml-paths-action@v0.1.0
+        uses: fabasoad/yaml-json-xml-converter-action@main
+        id: parseyaml
         with:
-          file: apps/searchingascode/searches/winRateByTier.yaml
+          #file: apps/searchingascode/searches/winRateByTier.yaml
+          path: apps/searchingascode/searches/winRateByTier.yaml
+          from: yaml
+          to: yaml
+      - name: Print YAML result
         env:
-          INPUT_SEARCH: search
-          INPUT_NAME: name
-          INPUT_VERSION: version
-          INPUT_APP: app
+          SHORTNAME: "${{ steps.parseyaml.outputs.data.shortname }}"
+          SEARCH: "${{ steps.parseyaml.outputs.data.search }}"
+          VERSION: "${{ steps.parseyaml.outputs.data.version }}"
+          APP: "${{ steps.parseyaml.outputs.data.app }}"
+        run: 
       - name: Push to Splunk Cloud
         env:
           USERNAME: ${{ secrets.SPLUNK_USERNAME }}
           PASSWORD: ${{ secrets.SPLUNK_PASSWORD }}
           URL: ${{ secrets.URL }}
+
         run: |
-          CODE="curl -k -u $USERNAME:$PASSWORD https://$URL:8089/servicesNS/admin/$APP/saved/searches -d name=$INPUT_NAME -d search=$INPUT_SEARCH"
+          CODE="curl -k -u $USERNAME:$PASSWORD https://$URL:8089/servicesNS/admin/$APP/saved/searches -d name=$SHORTNAME -d search=$SEARCH"
           if [ $CODE!="200"]
           then
-            curl -k -u user:passw https://$URL:8089/servicesNS/admin/$APP/saved/searches/$INPUT_NAME  -d search=$INPUT_SEARCH
-            echo "Updated $INPUT_NAME."
+            curl -k -u user:passw https://$URL:8089/servicesNS/admin/$APP/saved/searches/$SHORTNAME  -d search=$SEARCH
+            echo "Updated $SHORTNAME."
           else
-            echo "Created $INPUT_NAME."
+            echo "Created $SHORTNAME."
           fi
