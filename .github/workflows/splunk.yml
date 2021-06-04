@@ -32,7 +32,7 @@ jobs:
           PASSWORD: ${{ secrets.SPLUNK_PASSWORD }}
           URL: ${{ secrets.URL }}
         run: |
-          CODE=`curl -s -o /dev/null -w "%{http_code}" -k -X POST -u $USERNAME:$PASSWORD $URL/servicesNS/admin/$APP/saved/searches -d name=$SHORTNAME -d search=$SEARCH`
+          CODE=`curl -s -o /dev/null -w "%{http_code}" -k -X POST -u $USERNAME:$PASSWORD https://scb-o2-ohgwyyq7dpzxksr.stg.splunkcloud.com:8089/servicesNS/admin/searchingascode/saved/searches -d name=$SHORTNAME -d search=$SEARCH`
           if [ $CODE -eq 201 ]
           then
             echo "Created saved search $SHORTNAME."
