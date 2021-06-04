@@ -22,16 +22,19 @@ jobs:
           to: json
       - name: Get relevant fields from JSON file
         run: | 
-          echo '${{ steps.parseyaml.outputs.data }}' | jq '.shortname'
+          shortname='${{ steps.parseyaml.outputs.data }}' | jq '.shortname'
+          search='${{ steps.parseyaml.outputs.data }}' | jq '.search'
+          version='${{ steps.parseyaml.outputs.data }}' | jq '.version'
+          app='${{ steps.parseyaml.outputs.data }}' | jq '.app'
+          echo "SHORTNAME=$shortname" >> "$GITHUB_ENV"
+          echo "SEARCH=$search" >> "$GITHUB_ENV"
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+          echo "APP=$app" >> "$GITHUB_ENV"
       - name: Push to Splunk Cloud
         env:
           USERNAME: ${{ secrets.SPLUNK_USERNAME }}
           PASSWORD: ${{ secrets.SPLUNK_PASSWORD }}
           URL: ${{ secrets.URL }}
-          SHORTNAME: "${{ steps.parseyaml.outputs.data.shortname }}"
-          SEARCH: "${{ steps.parseyaml.outputs.data.search }}"
-          VERSION: "${{ steps.parseyaml.outputs.data.version }}"
-          APP: "${{ steps.parseyaml.outputs.data.app }}"
         run: |
           CODE="curl -k -u $USERNAME:$PASSWORD https://$URL:8089/servicesNS/admin/$APP/saved/searches -d name=$SHORTNAME -d search=$SEARCH"
           if [ $CODE!="200" ]
