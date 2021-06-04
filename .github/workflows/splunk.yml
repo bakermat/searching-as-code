@@ -17,7 +17,7 @@ jobs:
         uses: fabasoad/yaml-json-xml-converter-action@main
         id: parseyaml
         with:
-          path: apps/searchingascode/searches/*.yaml
+          path: apps/searchingascode/searches/winRateByTier.yaml
           from: yaml
           to: json
       - name: Get relevant fields from JSON file
