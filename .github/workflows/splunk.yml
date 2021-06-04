@@ -16,7 +16,7 @@ jobs:
       - name: Parse YAML File
         uses: CumulusDS/get-yaml-paths-action@v0.1.0
         with:
-          file: apps/searchAsCode/searches/winRateByTier.yaml
+          file: apps/searchingascode/searches/winRateByTier.yaml
         env:
           INPUT_SEARCH: search
           INPUT_NAME: name
