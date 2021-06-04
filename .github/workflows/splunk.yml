@@ -14,17 +14,14 @@ jobs:
         with:
           python-version: 3.x
       - name: Parse YAML File
-      # This action doesn't seem to work anymore
-      # uses: CumulusDS/get-yaml-paths-action@v0.1.0
         uses: fabasoad/yaml-json-xml-converter-action@main
         id: parseyaml
         with:
-          #file: apps/searchingascode/searches/winRateByTier.yaml
           path: apps/searchingascode/searches/winRateByTier.yaml
           from: yaml
           to: yaml
       - name: Print YAML result
-        run: echo "${{ steps.parseyaml.outputs.data }}"
+        run: echo "${{ steps.parseyaml.outputs.data.shortname }}"
       - name: Push to Splunk Cloud
         env:
           USERNAME: ${{ secrets.SPLUNK_USERNAME }}
