@@ -13,11 +13,19 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: 3.x
-      - name: Build app
-        run: xxx
+      - name: Parse YAML File
+        id: parse-yaml
+        uses: @cumulusds@v1.0.0
+        with:
+          file: winRateByTier.yaml
+        env:
+          INPUT_SEARCH: search
+          INPUT_NAME: name
+          INPUT_VERSION: version
       - name: Push to Splunk Cloud
         env:
           USERNAME: ${{ secrets.SPLUNK_USERNAME }}
           PASSWORD: ${{ secrets.SPLUNK_PASSWORD }}
           URL: ${{ secrets.URL }}
         run: curl -k -u $USERNAME:$PASSWORD $URL:8089/services/saved/searches
+        #run: curl -k -u admin:chang2me https://fool01:8092/services/saved/searches/test_durable  -d durable.track_time_type=_time -d durable.max_backfill_intervals=100  -d durable.lag_time=30 -d durable.backfill_type=time_interval 
