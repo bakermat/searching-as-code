@@ -14,10 +14,9 @@ jobs:
         with:
           python-version: 3.x
       - name: Parse YAML File
-        id: parse-yaml
-        uses: @cumulusds@v0.1.0
+        uses: CumulusDS/get-yaml-paths-action@v0.1.0
         with:
-          file: winRateByTier.yaml
+          file: apps/searchAsCode/searches/winRateByTier.yaml
         env:
           INPUT_SEARCH: search
           INPUT_NAME: name
@@ -31,7 +30,7 @@ jobs:
           CODE="curl -k -u user:passw https://scb-o2-ohgwyyq7dpzxksr.stg.splunkcloud.com:8089/servicesNS/admin/searchingascode/saved/searches -d name=$INPUT_NAME --data-urlencode search=$INPUT_SEARCH"
           if [ $CODE!="200"]
           then
-            curl -k -u user:passw https://scb-o2-ohgwyyq7dpzxksr.stg.splunkcloud.com:8089/servicesNS/admin/searchingascode/saved/searches/$INPUT_NAME --data-urlencode search=$INPUT_SEARCH"
+            curl -k -u user:passw https://scb-o2-ohgwyyq7dpzxksr.stg.splunkcloud.com:8089/servicesNS/admin/searchingascode/saved/searches/FlorisSavedSearch  -d search="index=_internal"
             echo "Updated $INPUT_NAME."
           else
             echo "Created $INPUT_NAME."
