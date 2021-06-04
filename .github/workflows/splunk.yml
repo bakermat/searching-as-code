@@ -32,13 +32,13 @@ jobs:
           PASSWORD: ${{ secrets.SPLUNK_PASSWORD }}
           URL: ${{ secrets.URL }}
         run: |
-          curl -k -u $USERNAME:$PASSWORD "$URL/servicesNS/admin/$APP/saved/searches" -d "name=$SHORTNAME" -d "search=$SEARCH"
+          CODE="curl -k -u $USERNAME:$PASSWORD $URL/servicesNS/admin/$APP/saved/searches -d name=$SHORTNAME -d search=$SEARCH
         #"curl -k -u $USERNAME:$PASSWORD https://$URL:8089/servicesNS/admin/$APP/saved/searches -d name=$SHORTNAME --data-urlencode 'search=$SEARCH'"
         # CODE="curl -k -u $USERNAME:$PASSWORD https://$URL:8089/servicesNS/admin/$APP/saved/searches -d name=$SHORTNAME -d search=$SEARCH"
-        # if [ $CODE!="200" ]
-        # then
-        #   curl -k -u user:passw https://$URL:8089/servicesNS/admin/$APP/saved/searches/$SHORTNAME  -d search=$SEARCH
-        #   echo "Updated $SHORTNAME."
-        # else
-        #   echo "Created $SHORTNAME."
-        # fi
+          if [ $CODE!="200" ]
+          then
+            curl -k -u $USERNAME:$PASSWORD $URL:8089/servicesNS/admin/$APP/saved/searches/$SHORTNAME -d search=$SEARCH
+            echo "Updated $SHORTNAME."
+          else
+            echo "Created $SHORTNAME."
+          fi
