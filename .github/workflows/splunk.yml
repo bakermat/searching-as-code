@@ -22,7 +22,7 @@ jobs:
           to: json
       - name: Get relevant fields from JSON file
         run: | 
-          echo "${{ steps.parseyaml.outputs.data }} | jq '.shortname'"
+          echo '${{ steps.parseyaml.outputs.data }}' | jq '.shortname'
       - name: Push to Splunk Cloud
         env:
           USERNAME: ${{ secrets.SPLUNK_USERNAME }}
