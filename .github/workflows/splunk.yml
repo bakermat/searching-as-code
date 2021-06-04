@@ -29,7 +29,7 @@ jobs:
           SEARCH: "${{ steps.parseyaml.outputs.data.search }}"
           VERSION: "${{ steps.parseyaml.outputs.data.version }}"
           APP: "${{ steps.parseyaml.outputs.data.app }}"
-        run: 
+        run: echo "${{ steps.parseyaml.outputs.data }}"
       - name: Push to Splunk Cloud
         env:
           USERNAME: ${{ secrets.SPLUNK_USERNAME }}
