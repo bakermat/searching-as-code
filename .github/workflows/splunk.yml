@@ -1,6 +1,7 @@
 name: Splunk Cloud
 on:
   push:
+    # Only trigger on the main branch and when YAML files have changed.
     branches:
       - main
     paths:
@@ -12,23 +13,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-        with:
-          python-version: 3.x
       - name: Parse YAML File
-        uses: fabasoad/yaml-json-xml-converter-action@main
-        id: parseyaml
+        uses: juliojimenez/yamler@v0
+        id: parse_yaml
         with:
-          path: apps/searchingascode/searches/winRateByTier.yaml
-          from: yaml
-          to: json
-      - name: Get relevant fields from JSON file
+          yaml-file: apps/searchingascode/searches/winRateByTier.yaml
+      - name: Show output and store as env variables
         run: | 
-          echo '${{ steps.parseyaml.outputs.data }}' | jq -r '"SHORTNAME="+.shortname' >> "$GITHUB_ENV"
-          echo '${{ steps.parseyaml.outputs.data }}' | jq -r '"SEARCH="+.search' >> "$GITHUB_ENV"
-          echo '${{ steps.parseyaml.outputs.data }}' | jq -r '"VERSION="+(.version|tostring)' >> "$GITHUB_ENV"
-          echo '${{ steps.parseyaml.outputs.data }}' | jq -r '"APP="+.app' >> "$GITHUB_ENV"
-        # Other fields could be added, like cron_schedule, description
+          echo NAME='${{ steps.parse_yaml.outputs.name }}' >> "$GITHUB_ENV"
+          echo DESCRIPTION='${{ steps.parse_yaml.outputs.description }}' >> "$GITHUB_ENV"
+          echo VERSION='${{ steps.parse_yaml.outputs.version }}' >> "$GITHUB_ENV"
+          echo APP='${{ steps.parse_yaml.outputs.app }}' >> "$GITHUB_ENV"
+          echo SEARCH='${{ steps.parse_yaml.outputs.search }}' >> "$GITHUB_ENV"
+          echo CRON_SCHEDULE='${{ steps.parse_yaml.outputs.cron_schedule }}' >> "$GITHUB_ENV"
       - name: Push to Splunk Cloud
         env:
           USERNAME: ${{ secrets.SPLUNK_USERNAME }}
@@ -36,11 +33,18 @@ jobs:
           URL: ${{ secrets.URL }}
         # Code below tries to add a new saved search called $SHORTNAME. If not successful, try to update instead as it might exist already.
         run: |
-          CODE=`curl -s -o /dev/null -w "%{http_code}" -k -X POST -u $USERNAME:$PASSWORD "$URL/servicesNS/nobody/$APP/saved/searches" -d "name=$SHORTNAME" -d "search=$SEARCH"`
+          CODE=`curl -s -o /dev/null -w "%{http_code}" -k -X POST -u $USERNAME:$PASSWORD "$URL/servicesNS/nobody/$APP/saved/searches" \
+          -d "name=$NAME" \
+          -d "description=$DESCRIPTION" \
+          -d "search=$SEARCH" \
+          -d "is_scheduled=True" \
+          -d "cron_schedule=$CRON_SCHEDULE"`
           if [ $CODE -eq 201 ]
           then
-            echo "Created saved search $SHORTNAME."
+            echo "Created saved search $NAME."
           else
-            curl -k -u $USERNAME:$PASSWORD "$URL/servicesNS/nobody/$APP/saved/searches/$SHORTNAME" -d "search=$SEARCH"
-            echo "Updated saved search $SHORTNAME."
+            curl -s -o /dev/null -w "%{http_code}" -k -X POST -u $USERNAME:$PASSWORD "$URL/servicesNS/nobody/$APP/saved/searches/$SHORTNAME" -d "search=$SEARCH"
+            echo "Updated saved search $NAME."
           fi
+          curl -s -o /dev/null -w "%{http_code}" -k -X GET -u ppeeters:5up3rn0va1 \
+          "$URL/servicesNS/nobody/$APP/saved/searches/_reload"
